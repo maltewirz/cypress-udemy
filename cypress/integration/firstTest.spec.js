@@ -2,10 +2,9 @@
 
 describe("Our second suite", () => {
   it("first test", () => {
-    cy.visit('/')
-
-    cy.contains('Forms').click()
-    cy.contains('Form Layouts').click()
+    cy.visit("/");
+    cy.contains("Forms").click();
+    cy.contains("Form Layouts").click();
 
     // <input
     //   _ngcontent-beu-c29=""
@@ -38,16 +37,38 @@ describe("Our second suite", () => {
     cy.get('[class="input-full-width size-medium shape-rectangle"]');
 
     // by Tag name and attribute with value
-    cy.get('input[placeholder="Email"]')
+    cy.get('input[placeholder="Email"]');
 
     // by two different attributes
-    cy.get('[placeholder="Email"][type="email"]')
+    cy.get('[placeholder="Email"][type="email"]');
 
     // by tag name, attribute with value, id and class name
-    cy.get('input[placeholder="Email"]#inputEmail1.input-full-width')
+    cy.get('input[placeholder="Email"]#inputEmail1.input-full-width');
 
     // by data-cy: best practise
-    cy.get('[data-cy="imputEmail1"]')
+    cy.get('[data-cy="imputEmail1"]');
+  });
 
+  it.only("second test", () => {
+    cy.visit("/");
+    cy.contains("Forms").click();
+    cy.contains("Form Layouts").click();
+
+    cy.get('[data-cy="signInButton"]');
+
+    cy.contains("Sign in");
+
+    cy.contains('[status="warning"]', "Sign in");
+
+    cy.get("#inputEmail3")
+      .parents("form")
+      .find("button")
+      .should("contain", "Sign in")
+      .parents("form")
+      .find("nb-checkbox")
+      .click();
+
+    // Find nb-card which contains horizontal form, then find element with attribute type
+    cy.contains("nb-card", "Horizontal form").find('[type="email"]');
   });
 });
