@@ -148,7 +148,32 @@ describe("Our second suite", () => {
       });
   });
 
-  it("assert property", () => {
+  it.only("assert property and choses a date dynamically on calender", () => {
+
+    function selectDayFromCurrent(day) {
+      let date = new Date();
+      date.setDate(date.getDate() + day);
+      let futureDay = date.getDate();
+      let futureMonth = date.toLocaleString("default", { month: "short" });
+      let dateAssert = futureMonth + " " +futureDay+ ", " + date.getFullYear();
+      
+      cy.get("nb-calendar-navigation")
+        .invoke("attr", "ng-reflect-date")
+        .then((dateAttribute) => {
+          if (!dateAttribute.includes(futureMonth)) {
+            cy.get('[data-name="chevron-right"]').click();
+            selectDayFromCurrent(day);
+          } else {
+            cy.get(
+              'nb-calendar-day-picker [class="day-cell ng-star-inserted"]'
+            )
+              .contains(futureDay)
+              .click();
+          }
+        });
+      return dateAssert
+    }
+
     cy.visit("/");
     cy.contains("Forms").click();
     cy.contains("Datepicker").click();
@@ -157,10 +182,10 @@ describe("Our second suite", () => {
       .find("input")
       .then((input) => {
         cy.wrap(input).click();
-        cy.get("nb-calendar-day-picker").contains("17").click();
+        let dateAssert = selectDayFromCurrent(100);
         cy.wrap(input)
           .invoke("prop", "value")
-          .should("contain", "Mar 17, 2022");
+          .should("contain", dateAssert);
       });
   });
 
@@ -232,7 +257,7 @@ describe("Our second suite", () => {
     });
   });
 
-  it.only("Web tables", () => {
+  it("Web tables", () => {
     cy.visit("/");
     cy.contains("Tables & Data").click();
     cy.contains("Smart Table").click();
@@ -268,17 +293,16 @@ describe("Our second suite", () => {
 
     // 3 Example
     const age = [20, 30, 40, 200];
-    cy.wrap(age).each(age => {
+    cy.wrap(age).each((age) => {
       cy.get('thead [placeholder="Age"]').clear().type(age);
       cy.wait(500);
       cy.get("tbody tr").each((tableRow) => {
         if (age === 200) {
-          cy.wrap(tableRow).should('contain', 'No data found')
+          cy.wrap(tableRow).should("contain", "No data found");
         } else {
           cy.wrap(tableRow).find("td").eq(6).should("contain", age);
         }
       });
-    })
-
+    });
   });
 });
