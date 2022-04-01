@@ -116,17 +116,24 @@ describe("Our second suite", () => {
     });
   });
 
-  it("invoke command", () => {
+  it("invoke command and assertions", () => {
     cy.visit("/");
     cy.contains("Forms").click();
     cy.contains("Form Layouts").click();
 
     // 1. Approach with Cypress
-    cy.get('[for="exampleInputEmail1"]').should("contain", "Email address");
+    cy.get('[for="exampleInputEmail1"]')
+      .should("contain", "Email address")
+      // you can use chai jquery syntax
+      .should("have.class", "label")
+      .should("have.text", "Email address");
 
     // 2. Approach with then using jquery method
     cy.get('[for="exampleInputEmail1"]').then((label) => {
       expect(label.text()).to.equal("Email address");
+      // you can use chai jquery syntax
+      expect(label).to.have.class("label");
+      expect(label).to.have.text("Email address");
     });
 
     // 3. Approach with Cypress invoke to get text from input
@@ -182,6 +189,8 @@ describe("Our second suite", () => {
         cy.wrap(input).click();
         let dateAssert = selectDayFromCurrent(100);
         cy.wrap(input).invoke("prop", "value").should("contain", dateAssert);
+        // same assertion in chai jquery syntax
+        cy.wrap(input).should('have.value', dateAssert)
       });
   });
 
@@ -311,28 +320,33 @@ describe("Our second suite", () => {
     cy.get("nb-tooltip").should("contain", "This is a tooltip");
   });
 
-  it.only("dialog box", () => {
+  it("dialog box", () => {
     cy.visit("/");
     cy.contains("Tables & Data").click();
     cy.contains("Smart Table").click();
 
     // First way - do not use
-    cy.get('tbody tr').first().find('.nb-trash').click()
-    cy.on('window.confirm', (confirm) => {
+    cy.get("tbody tr").first().find(".nb-trash").click();
+    cy.on("window.confirm", (confirm) => {
       // If event does not fire, this assert will never execute - bad
-      expect(confirm).to.equal('Are you sure you want to delete?')
-    })
+      expect(confirm).to.equal("Are you sure you want to delete?");
+    });
 
     // Second way
-    const stub = cy.stub()
-    cy.on('window:confirm', stub)
-    cy.get('tbody tr').first().find('.nb-trash').click().then(() => {
-      expect(stub.getCall(0)).to.be.calledWith('Are you sure you want to delete?')
-    })
+    const stub = cy.stub();
+    cy.on("window:confirm", stub);
+    cy.get("tbody tr")
+      .first()
+      .find(".nb-trash")
+      .click()
+      .then(() => {
+        expect(stub.getCall(0)).to.be.calledWith(
+          "Are you sure you want to delete?"
+        );
+      });
 
-    // Third way 
-    cy.get('tbody tr').first().find('.nb-trash').click()
-    cy.on('window.confirm', () => false)
-
+    // Third way
+    cy.get("tbody tr").first().find(".nb-trash").click();
+    cy.on("window.confirm", () => false);
   });
 });
